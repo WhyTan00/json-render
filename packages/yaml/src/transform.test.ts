@@ -169,6 +169,39 @@ describe("createYamlTransform", () => {
     ]);
   });
 
+  it("does not mutate emitted array values when a later patch moves items", async () => {
+    const output = await runTransform([
+      "```yaml-patch\n",
+      '{"op":"add","path":"/l","value":[1,2,3]}\n',
+      '{"op":"move","from":"/l/0","path":"/l/-"}\n',
+      "```\n",
+    ]);
+
+    expect(extractPatches(output)[0]).toEqual({
+      op: "add",
+      path: "/l",
+      value: [1, 2, 3],
+    });
+  });
+
+  it("applies yaml-patch copies split across single-character chunks", async () => {
+    const text = [
+      "```yaml-patch\n",
+      '{"op":"add","path":"/a~1b","value":1}\n',
+      '{"op":"copy","from":"/a~1b","path":"/c"}\n',
+      "```\n",
+      "```yaml-edit\n",
+      "c: null\n",
+      "```\n",
+    ].join("");
+    const output = await runTransform(text.split(""));
+
+    expect(extractPatches(output).at(-1)).toEqual({
+      op: "remove",
+      path: "/c",
+    });
+  });
+
   it("swallows fence delimiters (not emitted as text)", async () => {
     const output = await runTransform([
       "```yaml-spec\n",
