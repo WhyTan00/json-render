@@ -502,6 +502,13 @@ describe("applySpecStreamPatch", () => {
       expect(obj).toEqual({ a: 1, b: 1 });
     });
 
+    it("does not share nested objects between source and copy", () => {
+      const obj: Record<string, unknown> = { a: { x: 1 } };
+      applySpecStreamPatch(obj, { op: "copy", path: "/b", from: "/a" });
+      applySpecStreamPatch(obj, { op: "replace", path: "/b/x", value: 2 });
+      expect(obj.a).toEqual({ x: 1 });
+    });
+
     it("copies complex values", () => {
       const obj: Record<string, unknown> = {
         source: { nested: { value: 42 } },

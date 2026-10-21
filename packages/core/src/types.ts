@@ -632,7 +632,7 @@ export function applySpecStreamPatch<T extends Record<string, unknown>>(
     case "copy": {
       if (!patch.from) break;
       const copyValue = getByPath(obj, patch.from);
-      addByPath(obj, patch.path, copyValue);
+      addByPath(obj, patch.path, structuredClone(copyValue));
       break;
     }
     case "test": {

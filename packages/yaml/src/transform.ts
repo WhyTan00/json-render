@@ -99,7 +99,7 @@ export function createYamlTransform(
     closeTextBlock(controller);
     controller.enqueue({
       type: SPEC_DATA_PART_TYPE,
-      data: { type: "patch", patch },
+      data: { type: "patch", patch: structuredClone(patch) },
     });
   }
 
@@ -192,7 +192,7 @@ export function createYamlTransform(
         const patch = JSON.parse(trimmed) as JsonPatch;
         if (patch.op) {
           emitPatch(patch, controller);
-          applySpecStreamPatch(currentSpec, structuredClone(patch));
+          applySpecStreamPatch(currentSpec, patch);
         }
       } catch {
         // Skip invalid JSON lines

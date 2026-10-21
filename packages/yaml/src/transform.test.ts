@@ -184,6 +184,42 @@ describe("createYamlTransform", () => {
     });
   });
 
+  it("keeps copied objects independent in the working spec", async () => {
+    const output = await runTransform([
+      "```yaml-patch\n",
+      '{"op":"add","path":"/a","value":{"x":1}}\n',
+      '{"op":"copy","from":"/a","path":"/b"}\n',
+      '{"op":"replace","path":"/b/x","value":2}\n',
+      "```\n",
+      "```yaml-edit\n",
+      "a:\n  x: 2\n",
+      "```\n",
+    ]);
+
+    expect(extractPatches(output).at(-1)).toEqual({
+      op: "replace",
+      path: "/a/x",
+      value: 2,
+    });
+  });
+
+  it("does not mutate patches emitted by yaml-edit when a later patch moves items", async () => {
+    const output = await runTransform([
+      "```yaml-edit\n",
+      "l: [1, 2, 3]\n",
+      "```\n",
+      "```yaml-patch\n",
+      '{"op":"move","from":"/l/0","path":"/l/-"}\n',
+      "```\n",
+    ]);
+
+    expect(extractPatches(output)[0]).toEqual({
+      op: "add",
+      path: "/l",
+      value: [1, 2, 3],
+    });
+  });
+
   it("applies yaml-patch copies split across single-character chunks", async () => {
     const text = [
       "```yaml-patch\n",
