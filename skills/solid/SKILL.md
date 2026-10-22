@@ -165,10 +165,7 @@ Use `useBoundProp` in components for writable bound values:
 import { useBoundProp, type BaseComponentProps } from "@json-render/solid";
 
 function Input(props: BaseComponentProps<{ value?: string }>) {
-  const [, setValue] = useBoundProp(
-    props.props.value,
-    props.bindings?.value,
-  );
+  const [, setValue] = useBoundProp(props.props.value, props.bindings?.value);
   return (
     <input
       value={String(props.props.value ?? "")}

@@ -228,7 +228,7 @@ const { registry } = defineRegistry(catalog, {
 ### Solid (UI)
 
 ```tsx
-import { defineRegistry, Renderer } from "@json-render/solid";
+import { defineRegistry, JSONUIProvider, Renderer } from "@json-render/solid";
 import { schema } from "@json-render/solid/schema";
 
 const { registry } = defineRegistry(catalog, {
@@ -236,13 +236,15 @@ const { registry } = defineRegistry(catalog, {
     Card: (renderProps) => <div>{renderProps.children}</div>,
     Button: (renderProps) => (
       <button onClick={() => renderProps.emit("press")}>
-        {renderProps.element.props.label as string}
+        {renderProps.props.label}
       </button>
     ),
   },
 });
 
-<Renderer spec={spec} registry={registry} />;
+<JSONUIProvider registry={registry}>
+  <Renderer spec={spec} registry={registry} />
+</JSONUIProvider>;
 ```
 
 ### shadcn/ui (Web)

@@ -1699,9 +1699,9 @@
       "title": "@json-render/solid",
       "metadataTitle": "@json-render/solid API | json-render",
       "prefix": "import { pageMetadata } from \"@/lib/page-metadata\";\nexport const metadata = pageMetadata(\"docs/api/solid\");\n\n# @json-render/solid\n",
-      "sourceSha256": "06096f609fecadb661161f916022729a69e3e795778b47d2ad4c35c43ba90382",
-      "bodySha256": "85d432c81f3724465451a9634ac00345846a3517f84ed528bfbd6ea118be6ebe",
-      "markdownSha256": "48f9b3b85023d46fdc2e3b6bb73edbad42d5709b4e37266fe26a48bd29e1a4d3",
+      "sourceSha256": "c22fce4f22ada453ae47f7074f5ec0357a682a0216736b06d3c79d0f6c9c415a",
+      "bodySha256": "a95464b9079ce11528ae7fef9b61e1e1d3229cd7f13b9ccd874831aa240bf2a1",
+      "markdownSha256": "e7b1369756c6cade4dec10c8431364f1506443b44ca0463d298cabaa5d34f586",
       "headings": [
         {
           "title": "Installation",
@@ -3295,9 +3295,9 @@
       "title": "Renderers",
       "metadataTitle": "Renderers | json-render",
       "prefix": "import { pageMetadata } from \"@/lib/page-metadata\";\nexport const metadata = pageMetadata(\"docs/renderers\");\n\n# Renderers\n",
-      "sourceSha256": "05ddf37d2fe0f5d75cc8240e6363e68d3e26c9170c0de5cdde5da84174b22351",
-      "bodySha256": "d3a7220e4ce39b41f6218f062ed9a57658b96b5bb3b210a0c4dc9c2436c39417",
-      "markdownSha256": "79011088fe6f256ae139cabd0be5ac6c7669de0bc9b07b0d2786e48c26d68da2",
+      "sourceSha256": "316613936dd01db8cd41b5a94e9ba05326e48fa501c5432b4f47eca08463cb49",
+      "bodySha256": "c23123510fca30acf67c29a2a6417be3394b9e826e18571b4acfc00989cd8a62",
+      "markdownSha256": "c5c8f6b5aeb2ae9d09728f8d8ef107dc7cb7c7a19b274e325dc4a43482fc3e3e",
       "headings": [
         {
           "title": "React",

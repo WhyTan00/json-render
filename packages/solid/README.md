@@ -37,7 +37,9 @@ export const catalog = defineCatalog(schema, {
     },
     Input: {
       props: z.object({
-        value: z.union([z.string(), z.record(z.string(), z.unknown())]).nullable(),
+        value: z
+          .union([z.string(), z.record(z.string(), z.unknown())])
+          .nullable(),
         label: z.string(),
         placeholder: z.string().nullable(),
       }),
@@ -172,7 +174,7 @@ const store = createStateStore({ count: 0 });
 | `useActions()` / `useAction()`                | Action context and single-action helper               |
 | `useValidation()` / `useOptionalValidation()` | Validation context (throwing/non-throwing)            |
 | `useFieldValidation(path, config)`            | Field state accessors plus validate/touch/clear       |
-| `useBoundProp(value, binding)`                | Fine-grained two-way binding helper                   |
+| `useBoundProp(value, binding)`                | Resolved prop value plus a write-back setter          |
 | `useUIStream(options)`                        | Stream UI specs from an endpoint                      |
 | `useChatUI(options)`                          | Chat-style spec generation hook                       |
 
