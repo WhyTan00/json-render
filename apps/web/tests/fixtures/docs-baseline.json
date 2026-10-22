@@ -2007,9 +2007,9 @@
       "title": "@json-render/yaml",
       "metadataTitle": "@json-render/yaml API | json-render",
       "prefix": "import { pageMetadata } from \"@/lib/page-metadata\"\nexport const metadata = pageMetadata(\"docs/api/yaml\")\n\n# @json-render/yaml\n",
-      "sourceSha256": "94df2604b54bc051507ad9558bdbe0b7a8f9996d49393c31e3efbd5954b1af60",
-      "bodySha256": "284a9e520ebf01b0cf7ac54fb3cf05cca138b65ac63382243df02a291117ed34",
-      "markdownSha256": "caa78d90340912995e4cdde4c3c32e610d9f417bd4294f63c4253a5c7d1928f1",
+      "sourceSha256": "797f552427da1e0107be781341999e68741bd65fe9620216a5046d920475be1f",
+      "bodySha256": "f0bca6f7befb66c5397c2facaa00851e2ef98a0773138a858d67b8b2afdacb8f",
+      "markdownSha256": "a61124ef0f2b75b68a5a5666cfdd90382f3fec5e672b3262b0c92ad5e24918c4",
       "headings": [
         {
           "title": "Prompt Generation",

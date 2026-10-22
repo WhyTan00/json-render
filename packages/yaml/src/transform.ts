@@ -5,6 +5,7 @@ import {
   SPEC_DATA_PART_TYPE,
   deepMergeSpec,
   diffToPatches,
+  getByPath,
   type JsonPatch,
   type Spec,
   type StreamChunk,
@@ -192,7 +193,16 @@ export function createYamlTransform(
         const patch = JSON.parse(trimmed) as JsonPatch;
         if (patch.op) {
           emitPatch(patch, controller);
-          applySpecStreamPatch(currentSpec, patch);
+          applySpecStreamPatch(
+            currentSpec,
+            patch.op === "copy" && patch.from
+              ? {
+                  op: "add",
+                  path: patch.path,
+                  value: structuredClone(getByPath(currentSpec, patch.from)),
+                }
+              : patch,
+          );
         }
       } catch {
         // Skip invalid JSON lines
