@@ -1043,9 +1043,9 @@
       "title": "@json-render/react",
       "metadataTitle": "@json-render/react API | json-render",
       "prefix": "import { pageMetadata } from \"@/lib/page-metadata\"\nexport const metadata = pageMetadata(\"docs/api/react\")\n\n# @json-render/react\n",
-      "sourceSha256": "bac613efe7bbebe6c00606489a0ae21d367deb6753d15e334693b43b0f132ef3",
-      "bodySha256": "cd0213ad5a970a305d6a361ea802d469dd1ae079fcaac6d658ae3eef43902360",
-      "markdownSha256": "c45348165d2e6d1e6cd5e6104ea5fa58b187373fd1664866d4bcfde3361cf4c8",
+      "sourceSha256": "ff4c6f3db3b9d4f0771647b959ddcc393abf6d34c0d2e3c30659039e310ca80b",
+      "bodySha256": "56447f94b4178bc0d84953990438e2368f5495ce8b793b3511653f243258e0ed",
+      "markdownSha256": "8b4641f020565475af8274cbd7e4a040a5c69c60311165d92d0966f34beaa982",
       "headings": [
         {
           "title": "Providers",
@@ -2959,9 +2959,9 @@
       "title": "Generation Modes",
       "metadataTitle": "Generation Modes | json-render",
       "prefix": "import { pageMetadata } from \"@/lib/page-metadata\"\nexport const metadata = pageMetadata(\"docs/generation-modes\")\n\n# Generation Modes\n",
-      "sourceSha256": "f74a61660fb3794501215efabf837524e6cf135ec4b48994b7668fd8bea28587",
-      "bodySha256": "dd177fe6eb3e8eff9b76bcc36368416725f0b1bdc604b2dd48f5ca1eced73699",
-      "markdownSha256": "7082d16b441f27b278751364f77afef27b6782cb47390690f787d8e2a0bc7dad",
+      "sourceSha256": "8ee1dcf6d1070041aa0b7f2509cdf67dcab2f3d7fd104b9ee610415f39e295f7",
+      "bodySha256": "f08f71873ad51037bdc5c59489a0cbd5937aefa6f6d694a48ee0d87f20931f10",
+      "markdownSha256": "5e507344531458d2f61e41831563d3ca36c611287354a71e7b07d28fad5fe048",
       "headings": [
         {
           "title": "Standalone Mode",
