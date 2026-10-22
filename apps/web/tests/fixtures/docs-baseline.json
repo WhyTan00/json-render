@@ -131,9 +131,9 @@
       "title": "AI SDK Integration",
       "metadataTitle": "AI SDK Integration | json-render",
       "prefix": "import { pageMetadata } from \"@/lib/page-metadata\"\nexport const metadata = pageMetadata(\"docs/ai-sdk\")\n\n# AI SDK Integration\n",
-      "sourceSha256": "29a693954de5c57001bb2d715143fe4ec95744e5b55897866782de01a9e6d927",
-      "bodySha256": "d3a76b778dc7cb2fdfea9b12d963152885212b8e918285443c6b09cdfa17ff62",
-      "markdownSha256": "8fd68001f93eb735cc00db4c3efcd053311eee576e32ef6783d1295cd819a089",
+      "sourceSha256": "cba59b7589464649bf7fd851996eed45d2452b44abf0a0f8152633fa9667f9f2",
+      "bodySha256": "09763e85eb633ce011711bb1ea3f8d5fabc71ca0e1431475dc012c5063f0fdc8",
+      "markdownSha256": "564872db36fe70a98cc385160b17a5e3f4c4727d1ff25a0e675c120412ac71f0",
       "headings": [
         {
           "title": "Installation",
