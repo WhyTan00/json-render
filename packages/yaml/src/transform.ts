@@ -18,6 +18,23 @@ export const YAML_PATCH_FENCE = "```yaml-patch";
 export const DIFF_FENCE = "```diff";
 export const FENCE_CLOSE = "```";
 
+/** Most values the working spec may hold, so copy patches cannot grow it without limit. */
+const MAX_SPEC_NODES = 100_000;
+
+/** Counts the values in a JSON tree, stopping once the count passes `limit`. */
+function countNodes(value: unknown, limit: number): number {
+  let count = 0;
+  const stack: unknown[] = [value];
+  while (stack.length > 0 && count <= limit) {
+    const node = stack.pop();
+    count++;
+    if (node && typeof node === "object") {
+      for (const child of Object.values(node)) stack.push(child);
+    }
+  }
+  return count;
+}
+
 export interface YamlTransformOptions {
   /** Seed with a previous spec for multi-turn edit support. */
   previousSpec?: Spec;
@@ -191,18 +208,24 @@ export function createYamlTransform(
       if (!trimmed) continue;
       try {
         const patch = JSON.parse(trimmed) as JsonPatch;
-        if (patch.op) {
+        if (patch.op === "copy" && patch.from) {
+          const value = getByPath(currentSpec, patch.from);
+          if (
+            countNodes(currentSpec, MAX_SPEC_NODES) +
+              countNodes(value, MAX_SPEC_NODES) >
+            MAX_SPEC_NODES
+          ) {
+            continue;
+          }
           emitPatch(patch, controller);
-          applySpecStreamPatch(
-            currentSpec,
-            patch.op === "copy" && patch.from
-              ? {
-                  op: "add",
-                  path: patch.path,
-                  value: structuredClone(getByPath(currentSpec, patch.from)),
-                }
-              : patch,
-          );
+          applySpecStreamPatch(currentSpec, {
+            op: "add",
+            path: patch.path,
+            value: structuredClone(value),
+          });
+        } else if (patch.op) {
+          emitPatch(patch, controller);
+          applySpecStreamPatch(currentSpec, patch);
         }
       } catch {
         // Skip invalid JSON lines

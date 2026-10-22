@@ -184,6 +184,25 @@ describe("createYamlTransform", () => {
     });
   });
 
+  it("drops copy patches that would grow the working spec past its limit", async () => {
+    const copies = Array.from(
+      { length: 40 },
+      (_, i) => `{"op":"copy","from":"/a","path":"/a/c${i}"}\n`,
+    );
+    const output = await runTransform([
+      "```yaml-patch\n",
+      '{"op":"add","path":"/a","value":{"v":1}}\n',
+      ...copies,
+      "```\n",
+    ]);
+
+    const emitted = (extractPatches(output) as { op: string }[]).filter(
+      (p) => p.op === "copy",
+    );
+    expect(emitted.length).toBeGreaterThan(0);
+    expect(emitted.length).toBeLessThan(40);
+  });
+
   it("keeps copied objects independent in the working spec", async () => {
     const output = await runTransform([
       "```yaml-patch\n",
