@@ -3243,9 +3243,9 @@
       "title": "Registry",
       "metadataTitle": "Registry | json-render",
       "prefix": "import { pageMetadata } from \"@/lib/page-metadata\";\nexport const metadata = pageMetadata(\"docs/registry\");\n\n# Registry\n",
-      "sourceSha256": "0736a214267d9537ce6fdbd82d3b4ab543b60da4bacab3d972e360cb1824ef99",
-      "bodySha256": "9db7659e18a7bca3a65e0de02ed71521db4fe07a412c82368d857d6fd936b6e7",
-      "markdownSha256": "abe0fbf46046358028c1eb7b7f701a02c5d5251f2746aa166621eaf2902476e0",
+      "sourceSha256": "1cf5adbc8f51c0365aef7361ef003bdfb6d4f662342bd2039bf0e0671787a5fa",
+      "bodySha256": "3e9558ccba64405a11b3c75c8500114e1c142d3b5656bd4dcd7d77440484211c",
+      "markdownSha256": "84650a486457e0cfef17f58fb0a12fe85cd2f6d3b554439a1ddc27a116b459bd",
       "headings": [
         {
           "title": "@json-render/react",
