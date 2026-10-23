@@ -303,6 +303,8 @@ Use `findFormValue("email", params, state)` in action handlers to look up a defi
 
 The transform splits text blocks around spec data by emitting `text-end`/`text-start` pairs, ensuring the AI SDK creates separate text parts and preserving correct interleaving of prose and UI in `message.parts`.
 
+Text block boundaries (`text-start` and `text-end`), `start-step`, `error`, and `abort` flush pending content and reset spec-fence state. An unfinished fence in one block therefore cannot swallow prose in the next block or a retried step. Fence state is preserved across deltas within the same block.
+
 ### State Store
 
 | Export | Purpose |

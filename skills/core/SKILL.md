@@ -293,3 +293,5 @@ The `StateStore` interface: `get(path)`, `set(path, value)`, `update(updates)`, 
 | `check` | TypeScript helpers for creating validation checks |
 | `BuiltInAction` | Type for built-in action definitions (`name` + `description`) |
 | `ActionBinding` | Action binding type (includes `preventDefault` field) |
+
+`createJsonRenderTransform` flushes pending content and resets spec-fence state at text block boundaries (`text-start` and `text-end`), `start-step`, `error`, and `abort`. Deltas within one text block share fence state; an unfinished fence does not carry into a later block or retry.

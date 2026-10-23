@@ -448,6 +448,8 @@ Low-level `TransformStream` that separates text from JSONL patches in a mixed AI
 
 The transform properly splits text blocks around spec data by emitting `text-end`/`text-start` pairs, ensuring the AI SDK creates separate text parts and preserving correct interleaving of prose and UI in `message.parts`.
 
+Text block boundaries (`text-start` and `text-end`), `start-step`, `error`, and `abort` flush pending content and reset spec-fence state. An unfinished fence cannot swallow prose in the next block or a retried step. Deltas within the same text block retain their shared fence state.
+
 ```typescript
 import { createJsonRenderTransform } from '@json-render/core';
 

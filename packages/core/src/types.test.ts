@@ -1042,8 +1042,7 @@ describe("nestedToFlat", () => {
 // =============================================================================
 
 describe("createJsonRenderTransform", () => {
-  /** Helper: push text-delta chunks through the transform and collect output */
-  async function transformText(text: string): Promise<StreamChunk[]> {
+  async function transformChunks(input: StreamChunk[]): Promise<StreamChunk[]> {
     const transform = createJsonRenderTransform();
     const writer = transform.writable.getWriter();
     const reader = transform.readable.getReader();
@@ -1059,14 +1058,82 @@ describe("createJsonRenderTransform", () => {
       }
     })();
 
-    await writer.write({ type: "text-start", id: "t1" });
-    await writer.write({ type: "text-delta", id: "t1", delta: text });
-    await writer.write({ type: "text-end", id: "t1" });
+    for (const chunk of input) await writer.write(chunk);
     await writer.close();
 
     await readAll;
     return chunks;
   }
+
+  async function transformText(text: string): Promise<StreamChunk[]> {
+    return transformChunks([
+      { type: "text-start", id: "t1" },
+      { type: "text-delta", id: "t1", delta: text },
+      { type: "text-end", id: "t1" },
+    ]);
+  }
+
+  it.each(["text-end", "text-start", "start-step", "error", "abort"])(
+    "flushes a pending patch and resets an open fence at %s",
+    async (boundary) => {
+      const patch = { op: "add", path: "/root", value: "main" };
+      const boundaryChunk: StreamChunk =
+        boundary === "text-start"
+          ? { type: "text-start", id: "t2" }
+          : { type: boundary, id: "t1" };
+      const chunks = await transformChunks([
+        { type: "text-start", id: "t1" },
+        {
+          type: "text-delta",
+          id: "t1",
+          delta: "```spec\n" + JSON.stringify(patch),
+        },
+        boundaryChunk,
+        ...(boundary === "text-start"
+          ? []
+          : [{ type: "text-start", id: "t2" }]),
+        { type: "text-delta", id: "t2", delta: "Plain prose.\n" },
+        { type: "text-end", id: "t2" },
+      ]);
+
+      expect(chunks.filter((c) => c.type === SPEC_DATA_PART_TYPE)).toEqual([
+        { type: SPEC_DATA_PART_TYPE, data: { type: "patch", patch } },
+      ]);
+      expect(
+        chunks
+          .filter((c) => c.type === "text-delta")
+          .map((c) => (c as { delta: string }).delta)
+          .join(""),
+      ).toBe("Plain prose.\n");
+      if (["start-step", "error", "abort"].includes(boundary)) {
+        const boundaryIndex = chunks.indexOf(boundaryChunk);
+        expect(boundaryIndex).toBeGreaterThan(
+          chunks.findIndex((c) => c.type === SPEC_DATA_PART_TYPE),
+        );
+        expect(chunks[boundaryIndex - 1]?.type).toBe(SPEC_DATA_PART_TYPE);
+      }
+    },
+  );
+
+  it("keeps an open fence across deltas within the same text block", async () => {
+    const chunks = await transformChunks([
+      { type: "text-start", id: "t1" },
+      { type: "text-delta", id: "t1", delta: "``" },
+      { type: "text-delta", id: "t1", delta: "`spec\nHidden prose\n" },
+      { type: "text-delta", id: "t1", delta: '{"op":"add","path":"/root",' },
+      { type: "text-delta", id: "t1", delta: '"value":"main"}\n```\nDone.' },
+      { type: "text-end", id: "t1" },
+    ]);
+    expect(chunks.filter((c) => c.type === SPEC_DATA_PART_TYPE)).toHaveLength(
+      1,
+    );
+    expect(
+      chunks
+        .filter((c) => c.type === "text-delta")
+        .map((c) => (c as { delta: string }).delta)
+        .join(""),
+    ).toBe("Done.");
+  });
 
   it("passes prose text through as text-delta", async () => {
     const chunks = await transformText("Hello world\n");
