@@ -203,6 +203,44 @@ describe("createYamlTransform", () => {
     expect(emitted.length).toBeLessThan(40);
   });
 
+  it("drops copy patches once copied strings pass the byte budget", async () => {
+    const big = "x".repeat(16 * 1024);
+    const copies = Array.from(
+      { length: 200 },
+      (_, i) => `{"op":"copy","from":"/a","path":"/c${i}"}\n`,
+    );
+    const output = await runTransform([
+      "```yaml-patch\n",
+      `{"op":"add","path":"/a","value":"${big}"}\n`,
+      ...copies,
+      "```\n",
+    ]);
+
+    const emitted = (extractPatches(output) as { op: string }[]).filter(
+      (p) => p.op === "copy",
+    );
+    expect(emitted.length).toBeGreaterThan(0);
+    expect(emitted.length).toBeLessThan(200);
+  });
+
+  it("drops patches that would leave holes in an array", async () => {
+    const output = await runTransform([
+      "```yaml-patch\n",
+      '{"op":"add","path":"/a","value":[]}\n',
+      '{"op":"add","path":"/a/1000000000/x","value":1}\n',
+      '{"op":"add","path":"/b/5","value":1}\n',
+      '{"op":"add","path":"/a/0","value":1}\n',
+      '{"op":"add","path":"/a/-","value":2}\n',
+      "```\n",
+    ]);
+
+    expect(extractPatches(output)).toEqual([
+      { op: "add", path: "/a", value: [] },
+      { op: "add", path: "/a/0", value: 1 },
+      { op: "add", path: "/a/-", value: 2 },
+    ]);
+  });
+
   it("keeps copied objects independent in the working spec", async () => {
     const output = await runTransform([
       "```yaml-patch\n",

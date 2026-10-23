@@ -18,21 +18,48 @@ export const YAML_PATCH_FENCE = "```yaml-patch";
 export const DIFF_FENCE = "```diff";
 export const FENCE_CLOSE = "```";
 
-/** Most values the working spec may hold, so copy patches cannot grow it without limit. */
-const MAX_SPEC_NODES = 100_000;
+/** Most bytes that copy patches may add to the working spec in one stream. */
+const MAX_COPIED_BYTES = 1_000_000;
 
-/** Counts the values in a JSON tree, stopping once the count passes `limit`. */
-function countNodes(value: unknown, limit: number): number {
-  let count = 0;
+/** Approximates the size of a JSON value in bytes, stopping once it passes `limit`. */
+function measureBytes(value: unknown, limit: number): number {
+  let bytes = 0;
   const stack: unknown[] = [value];
-  while (stack.length > 0 && count <= limit) {
+  while (stack.length > 0 && bytes <= limit) {
     const node = stack.pop();
-    count++;
-    if (node && typeof node === "object") {
-      for (const child of Object.values(node)) stack.push(child);
+    if (typeof node === "string") {
+      bytes += node.length + 2;
+    } else if (node && typeof node === "object") {
+      bytes += 2;
+      for (const [key, child] of Object.entries(node)) {
+        bytes += key.length + 4;
+        stack.push(child);
+      }
+    } else {
+      bytes += 8;
     }
   }
-  return count;
+  return bytes;
+}
+
+/** Whether every array index in `path` is at most the array's length, so applying it leaves no holes. */
+function keepsArraysDense(spec: unknown, path: string): boolean {
+  let node: unknown = spec;
+  for (const raw of path.split("/").slice(1)) {
+    const segment = raw.replace(/~1/g, "/").replace(/~0/g, "~");
+    const isIndex = /^\d+$/.test(segment);
+    if (Array.isArray(node)) {
+      if (segment === "-") return true;
+      if (!isIndex || Number(segment) > node.length) return false;
+      node = node[Number(segment)];
+    } else if (node && typeof node === "object") {
+      node = (node as Record<string, unknown>)[segment];
+    } else {
+      if (isIndex && segment !== "0") return false;
+      node = undefined;
+    }
+  }
+  return true;
 }
 
 export interface YamlTransformOptions {
@@ -72,6 +99,7 @@ export function createYamlTransform(
 
   // Streaming compiler for yaml-spec progressive rendering
   let compiler = createYamlStreamCompiler<Record<string, unknown>>();
+  let copiedBytes = 0;
 
   // The "current spec" — built up during yaml-spec, used as base for yaml-edit
   let currentSpec: Record<string, unknown> = options?.previousSpec
@@ -208,22 +236,20 @@ export function createYamlTransform(
       if (!trimmed) continue;
       try {
         const patch = JSON.parse(trimmed) as JsonPatch;
+        if (!patch.op || !keepsArraysDense(currentSpec, patch.path)) continue;
         if (patch.op === "copy" && patch.from) {
           const value = getByPath(currentSpec, patch.from);
-          if (
-            countNodes(currentSpec, MAX_SPEC_NODES) +
-              countNodes(value, MAX_SPEC_NODES) >
-            MAX_SPEC_NODES
-          ) {
-            continue;
-          }
+          const remaining = MAX_COPIED_BYTES - copiedBytes;
+          const bytes = measureBytes(value, remaining);
+          if (bytes > remaining) continue;
+          copiedBytes += bytes;
           emitPatch(patch, controller);
           applySpecStreamPatch(currentSpec, {
             op: "add",
             path: patch.path,
             value: structuredClone(value),
           });
-        } else if (patch.op) {
+        } else {
           emitPatch(patch, controller);
           applySpecStreamPatch(currentSpec, patch);
         }
