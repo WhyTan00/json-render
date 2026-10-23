@@ -223,43 +223,6 @@ describe("createYamlTransform", () => {
     expect(emitted.length).toBeLessThan(200);
   });
 
-  it("drops patches that would leave holes in an array", async () => {
-    const output = await runTransform([
-      "```yaml-patch\n",
-      '{"op":"add","path":"/a","value":[]}\n',
-      '{"op":"add","path":"/a/1000000000/x","value":1}\n',
-      '{"op":"add","path":"/b/5","value":1}\n',
-      '{"op":"add","path":"a/1000000000/x","value":1}\n',
-      '{"op":"add","path":"/a/-/1000000000/x","value":1}\n',
-      '{"op":"add","path":"/a/0","value":1}\n',
-      '{"op":"add","path":"/a/-","value":2}\n',
-      "```\n",
-    ]);
-
-    expect(extractPatches(output)).toEqual([
-      { op: "add", path: "/a", value: [] },
-      { op: "add", path: "/a/0", value: 1 },
-      { op: "add", path: "/a/-", value: 2 },
-    ]);
-  });
-
-  it("checks a move's destination after its source is removed", async () => {
-    const output = await runTransform([
-      "```yaml-patch\n",
-      '{"op":"add","path":"/a","value":[0,{},[]]}\n',
-      '{"op":"move","from":"/a/0","path":"/a/1/1000000000/x"}\n',
-      '{"op":"add","path":"/a/1/0","value":1}\n',
-      "```\n",
-      "```yaml-edit\n",
-      "z: 1\n",
-      "```\n",
-    ]);
-
-    const patches = extractPatches(output) as { op: string; path: string }[];
-    expect(patches.some((p) => p.op === "move")).toBe(false);
-    expect(patches.at(-1)).toEqual({ op: "add", path: "/z", value: 1 });
-  });
-
   it("keeps copied objects independent in the working spec", async () => {
     const output = await runTransform([
       "```yaml-patch\n",

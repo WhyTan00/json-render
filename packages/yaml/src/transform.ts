@@ -1,13 +1,11 @@
 import { parse, stringify } from "yaml";
 import { applyPatch as applyUnifiedDiff } from "diff";
 import {
-  addByPath,
   applySpecStreamPatch,
   SPEC_DATA_PART_TYPE,
   deepMergeSpec,
   diffToPatches,
   getByPath,
-  removeByPath,
   type JsonPatch,
   type Spec,
   type StreamChunk,
@@ -42,29 +40,6 @@ function measureBytes(value: unknown, limit: number): number {
     }
   }
   return bytes;
-}
-
-/** Whether `path` is a well-formed pointer whose array indexes stay within each array, so applying it leaves no holes. */
-function keepsArraysDense(spec: unknown, path: string): boolean {
-  if (path === "") return true;
-  if (!path.startsWith("/")) return false;
-  const segments = path.slice(1).split("/");
-  let node: unknown = spec;
-  for (let i = 0; i < segments.length; i++) {
-    const segment = segments[i]!.replace(/~1/g, "/").replace(/~0/g, "~");
-    if (segment === "-") return i === segments.length - 1;
-    const isIndex = /^\d+$/.test(segment);
-    if (Array.isArray(node)) {
-      if (!isIndex || Number(segment) > node.length) return false;
-      node = node[Number(segment)];
-    } else if (node && typeof node === "object") {
-      node = (node as Record<string, unknown>)[segment];
-    } else {
-      if (isIndex && segment !== "0") return false;
-      node = undefined;
-    }
-  }
-  return true;
 }
 
 export interface YamlTransformOptions {
@@ -241,23 +216,8 @@ export function createYamlTransform(
       if (!trimmed) continue;
       try {
         const patch = JSON.parse(trimmed) as JsonPatch;
-        if (!patch.op || !keepsArraysDense(currentSpec, patch.path)) continue;
-        if (
-          patch.from !== undefined &&
-          !keepsArraysDense(currentSpec, patch.from)
-        ) {
-          continue;
-        }
-        if (patch.op === "move" && patch.from) {
-          const value = getByPath(currentSpec, patch.from);
-          removeByPath(currentSpec, patch.from);
-          if (!keepsArraysDense(currentSpec, patch.path)) {
-            if (value !== undefined) addByPath(currentSpec, patch.from, value);
-            continue;
-          }
-          emitPatch(patch, controller);
-          addByPath(currentSpec, patch.path, value);
-        } else if (patch.op === "copy" && patch.from) {
+        if (!patch.op) continue;
+        if (patch.op === "copy" && patch.from) {
           const value = getByPath(currentSpec, patch.from);
           const remaining = MAX_COPIED_BYTES - copiedBytes;
           const bytes = measureBytes(value, remaining);

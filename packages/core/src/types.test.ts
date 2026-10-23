@@ -398,14 +398,40 @@ describe("removeByPath", () => {
 // applySpecStreamPatch - RFC 6902 operations
 // =============================================================================
 
-describe("path helpers and __proto__", () => {
-  it("never writes to or deletes from Object.prototype", () => {
+describe("path helpers on untrusted paths", () => {
+  it("never writes to, reads from or deletes from Object.prototype", () => {
     const obj: Record<string, unknown> = {};
     setByPath(obj, "/__proto__/polluted", true);
     addByPath(obj, "/__proto__/polluted", true);
     removeByPath(obj, "/__proto__/toString");
+    applySpecStreamPatch(obj, {
+      op: "move",
+      from: "/__proto__",
+      path: "/alias",
+    });
+    applySpecStreamPatch(obj, {
+      op: "add",
+      path: "/alias/polluted",
+      value: true,
+    });
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
     expect(typeof Object.prototype.toString).toBe("function");
+  });
+
+  it("ignores array indexes past the end instead of leaving holes", () => {
+    const obj: Record<string, unknown> = { a: [0, {}, []] };
+    setByPath(obj, "/a/9", 1);
+    addByPath(obj, "a/1000000000/x", 1);
+    addByPath(obj, "/a/-/1000000000/x", 1);
+    applySpecStreamPatch(obj, {
+      op: "move",
+      from: "/a/0",
+      path: "/a/1/1000000000/x",
+    });
+    expect((obj.a as unknown[]).length).toBe(2);
+    expect((obj.a as unknown[])[1]).toEqual([]);
+    addByPath(obj, "/a/2", "end");
+    expect(obj.a).toEqual([{}, [], "end"]);
   });
 });
 
