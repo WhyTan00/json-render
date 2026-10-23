@@ -229,6 +229,8 @@ describe("createYamlTransform", () => {
       '{"op":"add","path":"/a","value":[]}\n',
       '{"op":"add","path":"/a/1000000000/x","value":1}\n',
       '{"op":"add","path":"/b/5","value":1}\n',
+      '{"op":"add","path":"a/1000000000/x","value":1}\n',
+      '{"op":"add","path":"/a/-/1000000000/x","value":1}\n',
       '{"op":"add","path":"/a/0","value":1}\n',
       '{"op":"add","path":"/a/-","value":2}\n',
       "```\n",

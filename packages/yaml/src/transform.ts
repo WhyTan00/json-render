@@ -42,14 +42,17 @@ function measureBytes(value: unknown, limit: number): number {
   return bytes;
 }
 
-/** Whether every array index in `path` is at most the array's length, so applying it leaves no holes. */
+/** Whether `path` is a well-formed pointer whose array indexes stay within each array, so applying it leaves no holes. */
 function keepsArraysDense(spec: unknown, path: string): boolean {
+  if (path === "") return true;
+  if (!path.startsWith("/")) return false;
+  const segments = path.slice(1).split("/");
   let node: unknown = spec;
-  for (const raw of path.split("/").slice(1)) {
-    const segment = raw.replace(/~1/g, "/").replace(/~0/g, "~");
+  for (let i = 0; i < segments.length; i++) {
+    const segment = segments[i]!.replace(/~1/g, "/").replace(/~0/g, "~");
+    if (segment === "-") return i === segments.length - 1;
     const isIndex = /^\d+$/.test(segment);
     if (Array.isArray(node)) {
-      if (segment === "-") return true;
       if (!isIndex || Number(segment) > node.length) return false;
       node = node[Number(segment)];
     } else if (node && typeof node === "object") {
