@@ -1,11 +1,13 @@
 import { parse, stringify } from "yaml";
 import { applyPatch as applyUnifiedDiff } from "diff";
 import {
+  addByPath,
   applySpecStreamPatch,
   SPEC_DATA_PART_TYPE,
   deepMergeSpec,
   diffToPatches,
   getByPath,
+  removeByPath,
   type JsonPatch,
   type Spec,
   type StreamChunk,
@@ -240,7 +242,22 @@ export function createYamlTransform(
       try {
         const patch = JSON.parse(trimmed) as JsonPatch;
         if (!patch.op || !keepsArraysDense(currentSpec, patch.path)) continue;
-        if (patch.op === "copy" && patch.from) {
+        if (
+          patch.from !== undefined &&
+          !keepsArraysDense(currentSpec, patch.from)
+        ) {
+          continue;
+        }
+        if (patch.op === "move" && patch.from) {
+          const value = getByPath(currentSpec, patch.from);
+          removeByPath(currentSpec, patch.from);
+          if (!keepsArraysDense(currentSpec, patch.path)) {
+            if (value !== undefined) addByPath(currentSpec, patch.from, value);
+            continue;
+          }
+          emitPatch(patch, controller);
+          addByPath(currentSpec, patch.path, value);
+        } else if (patch.op === "copy" && patch.from) {
           const value = getByPath(currentSpec, patch.from);
           const remaining = MAX_COPIED_BYTES - copiedBytes;
           const bytes = measureBytes(value, remaining);

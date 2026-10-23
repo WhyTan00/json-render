@@ -243,6 +243,23 @@ describe("createYamlTransform", () => {
     ]);
   });
 
+  it("checks a move's destination after its source is removed", async () => {
+    const output = await runTransform([
+      "```yaml-patch\n",
+      '{"op":"add","path":"/a","value":[0,{},[]]}\n',
+      '{"op":"move","from":"/a/0","path":"/a/1/1000000000/x"}\n',
+      '{"op":"add","path":"/a/1/0","value":1}\n',
+      "```\n",
+      "```yaml-edit\n",
+      "z: 1\n",
+      "```\n",
+    ]);
+
+    const patches = extractPatches(output) as { op: string; path: string }[];
+    expect(patches.some((p) => p.op === "move")).toBe(false);
+    expect(patches.at(-1)).toEqual({ op: "add", path: "/z", value: 1 });
+  });
+
   it("keeps copied objects independent in the working spec", async () => {
     const output = await runTransform([
       "```yaml-patch\n",
