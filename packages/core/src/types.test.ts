@@ -398,6 +398,17 @@ describe("removeByPath", () => {
 // applySpecStreamPatch - RFC 6902 operations
 // =============================================================================
 
+describe("path helpers and __proto__", () => {
+  it("never writes to or deletes from Object.prototype", () => {
+    const obj: Record<string, unknown> = {};
+    setByPath(obj, "/__proto__/polluted", true);
+    addByPath(obj, "/__proto__/polluted", true);
+    removeByPath(obj, "/__proto__/toString");
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    expect(typeof Object.prototype.toString).toBe("function");
+  });
+});
+
 describe("applySpecStreamPatch", () => {
   describe("add operation", () => {
     it("adds a new object property", () => {

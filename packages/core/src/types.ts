@@ -362,7 +362,7 @@ export function setByPath(
 ): void {
   const segments = parseJsonPointer(path);
 
-  if (segments.length === 0) return;
+  if (segments.length === 0 || segments.includes("__proto__")) return;
 
   let current: Record<string, unknown> | unknown[] = obj;
 
@@ -412,7 +412,7 @@ export function addByPath(
 ): void {
   const segments = parseJsonPointer(path);
 
-  if (segments.length === 0) return;
+  if (segments.length === 0 || segments.includes("__proto__")) return;
 
   let current: Record<string, unknown> | unknown[] = obj;
 
@@ -458,7 +458,7 @@ export function addByPath(
 export function removeByPath(obj: Record<string, unknown>, path: string): void {
   const segments = parseJsonPointer(path);
 
-  if (segments.length === 0) return;
+  if (segments.length === 0 || segments.includes("__proto__")) return;
 
   let current: Record<string, unknown> | unknown[] = obj;
 
