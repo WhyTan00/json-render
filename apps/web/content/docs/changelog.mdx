@@ -4,6 +4,28 @@ title: "Changelog"
 
 Notable changes and updates to json-render.
 
+## v0.21.2
+
+October 23, 2026
+
+### Fixed: Code Generation
+
+Generated prop objects now quote non-identifier keys and use computed syntax for `__proto__`, preserving it as an own property.
+
+### Fixed: Production Devtools
+
+Devtools now honor production bundle replacements for `process.env.NODE_ENV`, so they stay disabled in production browsers without a global `process` object.
+
+### Fixed: PDF Repeat Containers
+
+`renderToBuffer`, `renderToStream`, and `renderToFile` now render repeat containers once with each item's children inside, including the container for an empty repeat.
+
+### Fixed: React Registry Actions
+
+Registry actions now run with a no-op setter when no state setter is available, so actions that do not change state are still invoked.
+
+---
+
 ## v0.21.1
 
 October 13, 2026

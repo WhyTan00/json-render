@@ -1,8 +1,28 @@
 # Changelog
 
-## 0.21.1
+## 0.21.2
 
 <!-- release:start -->
+
+### Bug Fixes
+
+- **Code generation:** Quote non-identifier object keys and preserve `__proto__` as an own property when serializing props (#407)
+- **Production devtools:** Honor production bundle replacements for `process.env.NODE_ENV` so devtools stay disabled without a browser `process` global (#408)
+- **PDF repeats:** Render repeat containers once, including empty repeats, across server-side PDF output methods (#409)
+- **React registry actions:** Run actions with a no-op setter when no state setter is available (#410)
+
+### Contributors
+
+- @lahfir
+- @dajiaohuang
+- @Jassi2004
+- @xiehuanyi
+- @peter-cynomi
+- @Yi-111-a
+
+<!-- release:end -->
+
+## 0.21.1
 
 ### Bug Fixes
 
@@ -22,7 +42,6 @@
 - @fix2015
 - @kevin9327
 - @tmchow
-<!-- release:end -->
 
 ## 0.21.0
 

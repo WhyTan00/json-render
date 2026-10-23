@@ -2139,9 +2139,9 @@
       "title": "Changelog",
       "metadataTitle": "Changelog | json-render",
       "prefix": "import { pageMetadata } from \"@/lib/page-metadata\"\nexport const metadata = pageMetadata(\"docs/changelog\")\n\n# Changelog\n",
-      "sourceSha256": "ad86126e05152567880b659abff2b27d88cc7b696d27b8c6640dda13c38dc9c3",
-      "bodySha256": "586921975f057696b57045a41fbdeba5d4f469a48592ea604f0262d65be3b74b",
-      "markdownSha256": "3836699e187adc31520d62b168b1f921b7f9df4272798ebc28d90bc76272b063",
+      "sourceSha256": "48f0ddc1e79df3d675aaea3bdc866d706c419ea992f0df41a284ab62598f22eb",
+      "bodySha256": "8cbb452e1fe941de7f1c1f3b3af06476467d0532f13451d01fc279640ab4d1f5",
+      "markdownSha256": "5ae26d140490a612a74a2ef963a4a26f31ea2270b32bfca40641dd30a36bbff7",
       "headings": [
         {
           "title": "v0.21.0",
