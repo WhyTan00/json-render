@@ -30,8 +30,11 @@ export function deepMergeSpec(
 
     const baseVal = result[key];
 
-    if (isPlainObject(patchVal) && isPlainObject(baseVal)) {
-      result[key] = deepMergeSpec(baseVal, patchVal);
+    if (isPlainObject(patchVal)) {
+      result[key] = deepMergeSpec(
+        isPlainObject(baseVal) ? baseVal : {},
+        patchVal,
+      );
     } else {
       result[key] = patchVal;
     }
